@@ -1,7 +1,16 @@
 # checkhost-ruby
 checkhost-ruby is a Ruby gem to check-host.net API, supporting all the checks so far published (ping, http, tcp, dns and udp). The official API reference can be found [here](http://check-host.net/about/api).
-## Requirements
-Ruby2.0.0+, standard library.
+
+## Compatibility
+Only standard library is required.
+Tested on:
+* 1.9.1-p431
+* 1.9.3-p194
+* 1.9.3-p551
+* 2.0.0-p643
+* 2.1.5-p273
+* 2.2.1-p85
+
 ## Attributes
 ##### nodes
 

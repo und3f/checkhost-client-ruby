@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 require 'net/http'
+require 'open-uri'
 require 'json'
 
 class CheckHost
@@ -102,13 +103,9 @@ class CheckHost
         
         case action
         when :newcheck
-            uri = URI("http://check-host.net/check-#{data[:type]}?host=#{data[:host]}&max_nodes=#{data[:max_nodes]}")
-            api = Net::HTTP.new(uri.host)
-            api.get(uri, headers).body
+            open("http://check-host.net/check-#{data[:type]}?host=#{data[:host]}&max_nodes=#{data[:max_nodes]}", headers) {|io| io.read}
         when :results
-            uri = URI("http://check-host.net/check-result/#{data[:request_id]}")
-            api = Net::HTTP.new(uri.host)
-            api.get(uri, headers).body
+            open("http://check-host.net/check-result/#{data[:request_id]}", headers) {|io| io.read}
         end
     end
     
