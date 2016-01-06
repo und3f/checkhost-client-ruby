@@ -23,6 +23,8 @@ class CheckHost
         @nodes_info.each do |key, value|
             @nodes.push(key);
         end
+
+        res
     end
     
     def node_info(code) # cc, country, location
