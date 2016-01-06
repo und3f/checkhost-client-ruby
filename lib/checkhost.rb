@@ -50,6 +50,7 @@ class CheckHost
                     node_data[:avg_ok]        = 0
                     node_data[:avg_timeout]   = 0
                     node_data[:avg_malformed] = 0
+                    node_data[:total_count]   = value.count
 
                     value.each do |info|
                         node_data[:ip] = info[2] if(info[2])
