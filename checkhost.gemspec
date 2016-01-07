@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
     s.required_ruby_version = '>= 1.9.1'
     s.authors               = ["Marco Giosa"]
     s.email                 = 'markkuit@protonmail.ch'
-    s.files                 = ["lib/checkhost.rb", "lib/test.rb"]
+    s.files                 = ["lib/checkhost.rb"]
     s.homepage              = 'https://github.com/markkuit/checkhost-ruby'
     s.license               = 'MIT'
 end
