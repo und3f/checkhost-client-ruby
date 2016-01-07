@@ -44,63 +44,32 @@ module CheckHost
             res_data = {}
             res = parse(query(:results, {:request_id => @id}))
             res.each do |node, value|
-                if !value.nil? then value.flatten!(1) end
-                if !value.nil? && !value[0].nil? then # 'cause some return [nil] and can't flatten more
-                    node_data = {}
-                    case @options[:type]
-                    when 'ping' # avg_ok, avg_timeout, avg_malformed, ok_count, timeout_count, malformed_count, ip
-                        node_data[:ok_count] = 0
-                        node_data[:timeout_count] = 0
-                        node_data[:malformed_count] = 0
-                        node_data[:avg_ok]        = 0
-                        node_data[:avg_timeout]   = 0
-                        node_data[:avg_malformed] = 0
-                        node_data[:total_count]   = value.count
+                if value.nil? then
+                    res_data[node] = nil 
+                    next
+                end
 
-                        value.each do |info|
-                            node_data[:ip] = info[2] if(info[2])
-                            case info[0]
-                            when 'OK'
-                                node_data[:avg_ok]          += info[1]
-                                node_data[:ok_count]        += 1
-                            when 'TIMEOUT'
-                                node_data[:avg_timeout]     += info[1]
-                                node_data[:timeout_count]   += 1
-                            when 'MALFORMED'
-                                node_data[:avg_malformed]   += info[1]
-                                node_data[:malformed_count] += 1
-                            end
-                        end
-                        
-                        if(node_data[:ok_count] > 0) then
-                            node_data[:avg_ok] = (node_data[:avg_ok]*1000).to_i
-                            node_data[:avg_ok] /= node_data[:ok_count]
-                        end
-                        if(node_data[:timeout_count] > 0) then
-                            node_data[:avg_timeout] = (node_data[:avg_timeout]*1000).to_i
-                            node_data[:avg_timeout] /= node_data[:timeout_count]
-                        end
-                        if(node_data[:malformed_count] > 0) then
-                            node_data[:avg_malformed] = (node_data[:avg_malformed]*1000).to_i
-                            node_data[:avg_malformed] /= node_data[:malformed_count]
-                        end
-                    when 'http' # success, time, message, code, ip
-                        node_data[:success] = value[0]
-                        node_data[:time]    = (value[1]*1000).to_i
-                        node_data[:message] = value[2]
-                        node_data[:code]    = value[3].to_i
-                        node_data[:ip]      = value[4]
-                    when 'tcp', 'udp' # error, time, ip
-                        node_data[:error] = value[0]['error']
-                        node_data[:time]  = (value[0]['time']*1000).to_i
-                        node_data[:ip]    = value[0]['address']
-                    when 'dns' # a, aaaa, ttl
-                        node_data[:a]    = value[0]['A']
-                        node_data[:aaaa] = value[0]['AAAA']
-                        node_data[:ttl]  = value[0]['TTL']
-                    end
-                    res_data[node] = node_data
-                else res_data[node] = nil end
+                value.flatten!(1)
+                node_data = {}
+                case @options[:type]
+                when 'ping' # avg_ok, avg_timeout, avg_malformed, ok_count, timeout_count, malformed_count, ip
+                    node_data = process_ping(value)
+                when 'http' # success, time, message, code, ip
+                    node_data[:success] = value[0]
+                    node_data[:time]    = (value[1]*1000).to_i
+                    node_data[:message] = value[2]
+                    node_data[:code]    = value[3].to_i
+                    node_data[:ip]      = value[4]
+                when 'tcp', 'udp' # error, time, ip
+                    node_data[:error] = value[0]['error']
+                    node_data[:time]  = (value[0]['time']*1000).to_i
+                    node_data[:ip]    = value[0]['address']
+                when 'dns' # a, aaaa, ttl
+                    node_data[:a]    = value[0]['A']
+                    node_data[:aaaa] = value[0]['AAAA']
+                    node_data[:ttl]  = value[0]['TTL']
+                end
+                res_data[node] = node_data
             end
             return res_data
         end    
@@ -121,6 +90,46 @@ module CheckHost
             res = JSON.parse(json)
             raise "check-host.net returned error: #{res['error']}" if res.has_key?('error')
             return res
+        end
+
+        def process_ping(value)
+            node_data = {
+                :ok_count           => 0,
+                :timeout_count      => 0,
+                :malformed_count    => 0,
+                :total_count        => value.count,
+            };
+
+            ok_times = []
+            if value[0].nil? then
+                return node_data.merge({
+                    :error       => "Unknown host",
+                    :total_count => 0,
+                })
+            end
+
+            value.each do |info|
+                node_data[:ip] = info[2] if(info[2])
+                case info[0]
+                when 'OK'
+                    node_data[:ok_count] += 1
+                    ok_times.push(((info[1] * 1000.0 * 10.0).round())/10.0)
+                when 'TIMEOUT'
+                    node_data[:timeout_count] += 1
+                when 'MALFORMED'
+                    node_data[:malformed_count] += 1
+                end
+            end
+            
+            if(node_data[:ok_count] > 0) then
+                node_data[:rtt_min] = ok_times.min();
+                node_data[:rtt_max] = ok_times.max();
+                node_data[:rtt_avg] = ((ok_times.inject(0) do |sum, v|
+                        sum+v
+                end * 10.0).round() / 10.0)  / node_data[:ok_count];
+            end
+
+            node_data
         end
     end
 end
