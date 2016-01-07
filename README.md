@@ -1,15 +1,21 @@
-# checkhost-ruby
-checkhost-ruby is a Ruby gem to check-host.net API, supporting all the checks so far published (ping, http, tcp, dns and udp). The official API reference can be found [here](http://check-host.net/about/api).
+# checkhost-client-ruby
 
-## Compatibility
-Only standard library is required.
-Tested on:
-* 1.9.1-p431
-* 1.9.3-p194
-* 1.9.3-p551
-* 2.0.0-p643
-* 2.1.5-p273
-* 2.2.1-p85
+A simple ruby client for [Check-Host.net API](https://check-host.net/about/api).
+
+It was forked from checkhost-ruby to bring higher code quality.
+
+## Installation
+
+Add this line to your application's Gemfile (currently under development):
+
+```ruby
+gem 'checkhost-client'
+```
+
+And then execute:
+
+    $ bundle
+
 
 ## Attributes
 ##### nodes
@@ -26,9 +32,11 @@ Initializes a new instance to check *<host&gt;*. Note this doesn't actually begi
 
 ##### run()
 
-Sends the API request.
+Sends the check API request.
 
 ##### check()
+
+Send the check's result API request.
 
 Returns an hash containing the current check results, with nodes codes as keys.
 
@@ -37,6 +45,7 @@ Returns an hash containing the current check results, with nodes codes as keys.
 Returns an array containing country code, country name and location of the node.
 
 *<code&gt;*: node code (see *nodes* attribute)
+
 ## Example
 ```
 #!/usr/bin/env ruby
@@ -68,5 +77,6 @@ Italy: Found (in 16ms)
 United Kingdom: Found (in 4ms)
 Netherlands: Found (in 14ms)
 ```
+
 ## License
-checkhost-ruby is licensed under the MIT license. For a copy of the license refer to the LICENSE file.
+checkhost-client-ruby is licensed under the MIT license. For a copy of the license refer to the LICENSE file.
