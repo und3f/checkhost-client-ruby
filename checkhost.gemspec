@@ -5,9 +5,9 @@ Gem::Specification.new do |s|
     s.summary               = "Ruby check-host.net API"
     s.description           = "Gem to check-host.net public API"
     s.required_ruby_version = '>= 1.9.1'
-    s.authors               = ["Marco Giosa"]
-    s.email                 = 'markkuit@protonmail.ch'
+    s.authors               = ["Marco Giosa", "Sergii Zasenko"]
+    s.email                 = 'UNDEF@cpan.org'
     s.files                 = ["lib/checkhost.rb"]
-    s.homepage              = 'https://github.com/markkuit/checkhost-ruby'
+    s.homepage              = 'https://github.com/und3f/checkhost-ruby'
     s.license               = 'MIT'
 end
