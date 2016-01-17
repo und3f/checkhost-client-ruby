@@ -84,7 +84,7 @@ module CheckHost
         
         def parse(json)
             res = JSON.parse(json)
-            raise "check-host.net returned error: #{res['error']}" if res.has_key?('error')
+            raise "#{res['error']}" if res.has_key?('error')
             return res
         end
 
