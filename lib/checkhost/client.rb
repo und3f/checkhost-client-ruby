@@ -4,6 +4,19 @@ require 'open-uri'
 require 'json'
 
 module CheckHost
+    class CheckHostError < RuntimeError
+        @@errors = {
+            "limit_exceeded" => "Limit of checks is exceeded. Try again in a 10 minutes."
+        }
+        def describe_error
+            puts @@errors.inspect()
+            if (@@errors.has_key?(message)) then
+                return @@errors[message]
+            end
+            return message
+        end
+    end
+
     class Client
         attr_reader :nodes
         
@@ -84,7 +97,7 @@ module CheckHost
         
         def parse(json)
             res = JSON.parse(json)
-            raise "#{res['error']}" if res.has_key?('error')
+            raise CheckHostError.new(res['error']) if res.has_key?('error')
             return res
         end
 
